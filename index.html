@@ -4,9 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0f2a4a" />
-<title>A question for Alessia 💌</title>
+<title>Where are we going, Alessia? 💌</title>
 
-<!-- Optional pretty fonts; the page still looks good if these fail to load -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -25,7 +24,6 @@
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
   html, body { height: 100%; margin: 0; }
 
   body {
@@ -47,296 +45,176 @@
       linear-gradient(160deg, var(--cream) 0%, var(--cream-deep) 100%);
   }
 
-  /* Confetti canvas sits above everything but ignores taps */
-  #confetti {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 50;
-  }
+  #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
 
   .card {
     width: 100%;
-    max-width: 540px;
-    background: rgba(255, 255, 255, 0.78);
+    max-width: 460px;
+    background: rgba(255, 255, 255, 0.82);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     border: 1px solid rgba(15, 42, 74, 0.08);
     border-radius: 26px;
     box-shadow: var(--shadow);
-    padding: 40px 30px;
+    padding: 36px 26px;
     text-align: center;
     position: relative;
     z-index: 2;
     animation: rise 0.6s ease both;
   }
+  @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
+  .eyebrow { letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.72rem; font-weight: 600; color: var(--navy-soft); opacity: 0.7; margin: 0 0 12px; }
+  h1 { font-family: "Playfair Display", Georgia, serif; font-weight: 700; line-height: 1.18; font-size: clamp(1.5rem, 5.8vw, 2.15rem); margin: 0 0 8px; color: var(--navy); }
+  .subtitle { font-size: clamp(0.95rem, 3.6vw, 1.06rem); color: var(--navy-soft); margin: 0 auto 24px; max-width: 360px; line-height: 1.5; }
+
+  /* ===== Scratch cards ===== */
+  .scratch-stack { display: flex; flex-direction: column; gap: 14px; margin: 6px 0 4px; }
+  .scard {
+    position: relative;
+    height: 118px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(15, 42, 74, 0.12);
+    user-select: none;
+    -webkit-user-select: none;
   }
-
-  .eyebrow {
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--navy-soft);
-    opacity: 0.7;
-    margin: 0 0 14px;
+  .reveal {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px;
+    background: linear-gradient(140deg, #fff 0%, var(--cream) 100%);
   }
+  .reveal .ricon { font-size: 1.9rem; line-height: 1; }
+  .reveal .rname { font-family: "Playfair Display", Georgia, serif; font-weight: 700; font-size: 1.5rem; color: var(--navy); margin-top: 2px; }
+  .reveal .rtag { font-size: 0.8rem; color: var(--navy-soft); opacity: 0.85; }
+  canvas.scratch { position: absolute; inset: 0; z-index: 2; touch-action: none; cursor: grab; }
+  .scard.done canvas.scratch { opacity: 0; transition: opacity 0.4s ease; pointer-events: none; }
+  .scard.done .reveal { animation: pop 0.5s ease both; }
+  @keyframes pop { 0% { transform: scale(0.85); } 70% { transform: scale(1.06); } 100% { transform: scale(1); } }
 
-  h1 {
-    font-family: "Playfair Display", Georgia, "Times New Roman", serif;
-    font-weight: 700;
-    line-height: 1.18;
-    font-size: clamp(1.55rem, 6.2vw, 2.35rem);
-    margin: 0 0 8px;
-    color: var(--navy);
-  }
+  .scratch-msg { min-height: 24px; font-size: 0.98rem; font-weight: 600; color: var(--red); margin: 14px 0 6px; }
 
-  .subtitle {
-    font-size: clamp(0.95rem, 3.6vw, 1.08rem);
-    color: var(--navy-soft);
-    margin: 0 auto 30px;
-    max-width: 380px;
-    line-height: 1.5;
-  }
-
-  .buttons {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    min-height: 60px;
-  }
-
-  /* Empty room beneath the buttons so the runaway "No" always has free space */
-  .playzone { height: 120px; }
-
-  button {
-    font-family: inherit;
-    font-size: 1.05rem;
-    font-weight: 600;
-    border-radius: 999px;
-    cursor: pointer;
-    border: 2px solid transparent;
-    padding: 14px 34px;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  /* ===== Buttons / form ===== */
+  .btn-primary {
+    font-family: inherit; font-size: 1.05rem; font-weight: 600;
+    border: 2px solid transparent; border-radius: 999px; cursor: pointer;
+    padding: 14px 30px; background: var(--navy); color: var(--cream);
+    box-shadow: 0 10px 24px rgba(15, 42, 74, 0.28);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
     touch-action: manipulation;
   }
+  .btn-primary:hover { transform: translateY(-2px) scale(1.02); }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-ghost {
+    font-family: inherit; font-size: 0.95rem; font-weight: 600;
+    border: 2px solid rgba(15, 42, 74, 0.3); border-radius: 999px; cursor: pointer;
+    padding: 11px 20px; background: transparent; color: var(--navy-soft);
+    transition: border-color 0.18s ease, transform 0.15s ease;
+    touch-action: manipulation;
+  }
+  .btn-ghost:hover { border-color: var(--navy); }
+  .btn-ghost:active { transform: scale(0.97); }
+  .hidden { display: none !important; }
 
-  #yesBtn {
-    background: var(--navy);
-    color: var(--cream);
-    box-shadow: 0 10px 24px rgba(15, 42, 74, 0.28);
-    animation: pulse 1.8s ease-in-out infinite;
+  .field-label { display: block; text-align: left; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em; color: var(--navy-soft); margin: 4px 4px 6px; }
+  #addr {
+    width: 100%; font-family: inherit; font-size: 1rem; color: var(--navy);
+    padding: 14px 16px; border-radius: 14px; border: 1.5px solid rgba(15, 42, 74, 0.25);
+    background: #fff; resize: vertical; min-height: 92px; line-height: 1.4;
   }
-  #yesBtn:hover { transform: translateY(-2px) scale(1.03); }
-  #yesBtn:active { transform: scale(0.97); }
+  #addr:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(15, 42, 74, 0.08); }
+  .geo-row { display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 14px 0 4px; }
+  .geo-status { font-size: 0.85rem; color: var(--navy-soft); }
+  .geo-status.ok { color: #157347; font-weight: 600; }
+  .actions { margin-top: 20px; }
 
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 10px 24px rgba(15, 42, 74, 0.28); }
-    50%      { box-shadow: 0 10px 34px rgba(230, 57, 70, 0.45); }
-  }
+  /* ===== Sections ===== */
+  #pickup, #done { display: none; }
+  #pickup.visible, #done.visible { display: block; animation: rise 0.5s ease both; }
 
-  #noBtn {
-    background: transparent;
-    color: var(--navy-soft);
-    border-color: rgba(15, 42, 74, 0.35);
-    z-index: 60;
-  }
+  .big-emoji { font-size: 3rem; margin-bottom: 6px; animation: pop 0.6s ease both; }
 
-  /* Taunt bubble that follows the runaway No button */
-  #taunt {
-    position: fixed;
-    z-index: 61;
-    background: var(--red);
-    color: #fff;
-    font-size: 0.82rem;
-    font-weight: 600;
-    padding: 7px 12px;
-    border-radius: 999px;
-    box-shadow: 0 8px 20px rgba(230, 57, 70, 0.4);
-    pointer-events: none;
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.8);
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    white-space: nowrap;
-  }
-  #taunt.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-
-  /* ===== Day picker ===== */
-  #choose { display: none; }
-  #choose.visible { display: block; animation: rise 0.5s ease both; }
-
-  .day-options {
-    display: flex;
-    gap: 14px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 4px;
-  }
-  .day-btn {
-    flex: 1 1 180px;
-    max-width: 220px;
-    background: #fff;
-    border: 2px solid rgba(15, 42, 74, 0.22);
-    border-radius: 18px;
-    padding: 20px 16px;
-    cursor: pointer;
-    text-align: center;
-    color: var(--navy);
-  }
-  .day-btn:hover {
-    transform: translateY(-3px);
-    border-color: var(--navy);
-    box-shadow: 0 12px 26px rgba(15, 42, 74, 0.18);
-  }
-  .day-btn:active { transform: scale(0.98); }
-  .day-btn .dow {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 1.35rem;
-    font-weight: 700;
-    display: block;
-  }
-  .day-btn .date { font-size: 1rem; font-weight: 600; margin-top: 4px; color: var(--navy-soft); }
-  .day-btn .time { font-size: 0.85rem; margin-top: 8px; color: var(--navy-soft); opacity: 0.85; }
-  .day-btn .time::before { content: "🕗 "; }
-
-  /* ===== Confirmation screen ===== */
-  #confirmed { display: none; }
-  #confirmed.visible { display: block; animation: rise 0.6s ease both; }
-
-  .big-emoji {
-    font-size: 3rem;
-    margin-bottom: 6px;
-    animation: pop 0.6s ease both;
-  }
-  @keyframes pop {
-    0% { transform: scale(0); }
-    70% { transform: scale(1.25); }
-    100% { transform: scale(1); }
-  }
-
-  .details {
-    margin: 26px auto 6px;
-    text-align: left;
-    max-width: 360px;
-    background: rgba(15, 42, 74, 0.04);
-    border: 1px solid rgba(15, 42, 74, 0.08);
-    border-radius: 18px;
-    padding: 18px 20px;
-  }
-  .detail-row {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding: 9px 0;
-    border-bottom: 1px dashed rgba(15, 42, 74, 0.14);
-  }
+  .details { margin: 24px auto 6px; text-align: left; max-width: 360px; background: rgba(15, 42, 74, 0.04); border: 1px solid rgba(15, 42, 74, 0.08); border-radius: 18px; padding: 16px 20px; }
+  .detail-row { display: flex; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px dashed rgba(15, 42, 74, 0.14); }
   .detail-row:last-child { border-bottom: none; }
-  .detail-label {
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--navy-soft);
-    opacity: 0.75;
-    min-width: 74px;
-    font-weight: 600;
-  }
-  .detail-value { font-size: 1.05rem; font-weight: 600; color: var(--navy); }
+  .detail-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--navy-soft); opacity: 0.75; min-width: 74px; font-weight: 600; }
+  .detail-value { font-size: 1.02rem; font-weight: 600; color: var(--navy); word-break: break-word; }
 
-  .contact {
-    margin-top: 24px;
-    font-size: 0.95rem;
-    color: var(--navy-soft);
-    line-height: 1.7;
-  }
+  .contact { margin-top: 22px; font-size: 0.92rem; color: var(--navy-soft); line-height: 1.7; }
   .contact p { margin: 0 0 8px; }
-  .contact a {
-    color: var(--navy);
-    font-weight: 600;
-    text-decoration: none;
-    border-bottom: 2px solid var(--yellow);
-  }
-  .contact a:hover { border-bottom-color: var(--red); }
+  .contact a { color: var(--navy); font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--yellow); }
 
-  .footer-heart {
-    margin-top: 22px;
-    font-size: 1.4rem;
-    color: var(--red);
-    animation: beat 1.3s ease-in-out infinite;
-  }
-  @keyframes beat {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.18); }
-  }
+  .footer-heart { margin-top: 20px; font-size: 1.4rem; color: var(--red); animation: beat 1.3s ease-in-out infinite; }
+  @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
 </style>
 </head>
 <body>
   <canvas id="confetti"></canvas>
 
   <main class="card">
-    <!-- ===== Question screen ===== -->
-    <section id="question">
-      <p class="eyebrow">A little question</p>
-      <h1>Hi Alessia,<br />Do you want to go on a date with me?</h1>
-      <p class="subtitle">No pressure&hellip; well, maybe a little. 😊</p>
-      <div class="buttons">
-        <button id="yesBtn" type="button">Yes 💛</button>
-        <button id="noBtn" type="button">No</button>
-      </div>
-      <div class="playzone" aria-hidden="true"></div>
-    </section>
+    <!-- ===== Scratch screen ===== -->
+    <section id="scratch">
+      <p class="eyebrow">The location</p>
+      <h1>Scratch to reveal our spot</h1>
+      <p class="subtitle">Three mystery cards, Alessia. Scratch them to see where I&rsquo;m taking you&hellip; 🎟️</p>
 
-    <!-- ===== Day picker screen ===== -->
-    <section id="choose">
-      <div class="big-emoji">💛</div>
-      <p class="eyebrow">Great answer</p>
-      <h1>Now pick our evening</h1>
-      <p class="subtitle">Which day works best for you? Tap the one you prefer. 🥂</p>
-      <div class="day-options">
-        <button class="day-btn" type="button" data-key="wed" data-dow="Wednesday" data-date="08.07.2026">
-          <span class="dow">Wednesday</span>
-          <span class="date">08.07.2026</span>
-          <span class="time">8:00 PM</span>
-        </button>
-        <button class="day-btn" type="button" data-key="thu" data-dow="Thursday" data-date="09.07.2026">
-          <span class="dow">Thursday</span>
-          <span class="date">09.07.2026</span>
-          <span class="time">8:00 PM</span>
-        </button>
+      <div class="scratch-stack">
+        <div class="scard" data-n="1">
+          <div class="reveal"><div class="ricon">🍝</div><div class="rname">Padella1895</div><div class="rtag">Italian · candlelit · our kind of place</div></div>
+          <canvas class="scratch"></canvas>
+        </div>
+        <div class="scard" data-n="2">
+          <div class="reveal"><div class="ricon">🍝</div><div class="rname">Padella1895</div><div class="rtag">Italian · candlelit · our kind of place</div></div>
+          <canvas class="scratch"></canvas>
+        </div>
+        <div class="scard" data-n="3">
+          <div class="reveal"><div class="ricon">🍝</div><div class="rname">Padella1895</div><div class="rtag">Italian · candlelit · our kind of place</div></div>
+          <canvas class="scratch"></canvas>
+        </div>
+      </div>
+
+      <p id="scratchMsg" class="scratch-msg"></p>
+      <div class="actions">
+        <button id="toPickup" class="btn-primary hidden" type="button">Let&rsquo;s go to Padella1895 →</button>
       </div>
     </section>
 
-    <!-- ===== Confirmation screen ===== -->
-    <section id="confirmed">
+    <!-- ===== Pickup screen ===== -->
+    <section id="pickup">
+      <div class="big-emoji">🚗</div>
+      <p class="eyebrow">One more thing</p>
+      <h1>Where should I pick you up?</h1>
+      <p class="subtitle">Type your address (a street + number, or a landmark I&rsquo;ll recognise).</p>
+
+      <label class="field-label" for="addr">Your pick-up address</label>
+      <textarea id="addr" placeholder="e.g. Str. Exemplu 12, near the park entrance…"></textarea>
+
+      <div class="geo-row">
+        <button id="geoBtn" class="btn-ghost" type="button">📍 Use my current location</button>
+        <span id="geoStatus" class="geo-status"></span>
+      </div>
+
+      <div class="actions">
+        <button id="confirmPickup" class="btn-primary" type="button">Confirm pick-up 💛</button>
+      </div>
+    </section>
+
+    <!-- ===== Done screen ===== -->
+    <section id="done">
       <div class="big-emoji">🎉</div>
-      <p class="eyebrow">It's a date</p>
-      <h1 id="confHeading">See you then!</h1>
-      <p class="subtitle">Can&rsquo;t wait to see you &mdash; I&rsquo;ll share the exact spot soon. 🥂</p>
+      <p class="eyebrow">All set</p>
+      <h1>It&rsquo;s a date at Padella1895!</h1>
+      <p class="subtitle">Can&rsquo;t wait to see you. I&rsquo;ll be there to pick you up. 🥂</p>
 
       <div class="details">
-        <div class="detail-row">
-          <span class="detail-label">Date</span>
-          <span class="detail-value" id="confDate">&mdash;</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Time</span>
-          <span class="detail-value">8:00 PM &mdash; pick-up</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Location</span>
-          <span class="detail-value">To be announced</span>
-        </div>
+        <div class="detail-row"><span class="detail-label">Place</span><span class="detail-value">Padella1895</span></div>
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">8:00 PM — pick-up</span></div>
+        <div class="detail-row"><span class="detail-label">Pick-up</span><span class="detail-value" id="donePickup">—</span></div>
       </div>
 
       <div class="contact">
-        <p>For more information or any questions, please contact me:</p>
+        <p>For anything at all, reach me:</p>
         <p>✉️ <a href="mailto:denisboldu2014@gmail.com">denisboldu2014@gmail.com</a></p>
         <p>📞 <a href="tel:0770803690">0770 803 690</a></p>
       </div>
@@ -345,172 +223,193 @@
     </section>
   </main>
 
-  <div id="taunt"></div>
-
 <script>
 (function () {
   "use strict";
 
-  /* ===== Phone notifications via ntfy.sh (no account needed) =====
-     Subscribe to this exact topic in the free "ntfy" app to get the alerts.
-     Keep the topic name PRIVATE — anyone who knows it can read the pings. */
+  /* ===== Notifications to Denis (same topic as the invite) ===== */
   var NTFY_TOPIC = "alessia-b38hy7m28h2v";
   function notify(message) {
     try {
-      fetch("https://ntfy.sh/" + NTFY_TOPIC, {
-        method: "POST",
-        body: message,
-        keepalive: true
-      }).catch(function () {}); // never let a failed ping break the page
+      fetch("https://ntfy.sh/" + NTFY_TOPIC, { method: "POST", body: message, keepalive: true })
+        .catch(function () {});
     } catch (e) {}
   }
-  // Fire as soon as the page is opened
-  notify("Alessia just opened the date site! 💌");
+  notify("Alessia opened the location page 💌");
 
-  var noBtn    = document.getElementById("noBtn");
-  var yesBtn   = document.getElementById("yesBtn");
-  var taunt    = document.getElementById("taunt");
-  var question = document.getElementById("question");
-  var choose   = document.getElementById("choose");
-  var confirmed = document.getElementById("confirmed");
-  var card     = document.querySelector(".card");
+  /* ===== Scratch cards (all secretly Padella1895) ===== */
+  var revealed = 0;
+  var total = document.querySelectorAll(".scard").length;
+  var msgEl = document.getElementById("scratchMsg");
+  var toPickup = document.getElementById("toPickup");
+  var lockedNotified = false;
 
-  var taunts = [
-    "Nope! 😜", "Try again!", "Catch me if you can! 🏃", "Too slow! 🐌",
-    "Not today! 😎", "Wrong button 😅", "Hehe, nope!", "Nice try! 😏",
-    "Missed me! 👻", "Think again 🤔", "Just say yes already 💛",
-    "This button is shy 🙈", "Error 404: No not found", "Slippery, aren't I? 🧈",
-    "Yes is right there → 👉"
-  ];
-  var dodgeCount = 0;
+  var messages = {
+    1: "🍝 Padella1895! Great taste. (Go on… try the others 👀)",
+    2: "😄 Wait… also Padella1895?",
+    3: "😂 Okay okay — every card is Padella1895. It was always the one. ❤️"
+  };
 
-  /* ---- Make the No button run away ---- */
-  function moveNo() {
-    var w = noBtn.offsetWidth || 80;
-    var h = noBtn.offsetHeight || 48;
-    var pad = 12;
-    var cardRect = card.getBoundingClientRect();
-    var maxX = Math.max(pad, card.clientWidth  - w - pad);
-    var maxY = Math.max(pad, card.clientHeight - h - pad);
+  function setupCard(scard) {
+    var canvas = scard.querySelector("canvas.scratch");
+    var ctx = canvas.getContext("2d");
+    var w = scard.clientWidth, h = scard.clientHeight;
+    canvas.width = w;
+    canvas.height = h;
 
-    // Areas the button must NOT cover: the question text + the Yes button
-    var avoid = [];
-    question.querySelectorAll(".eyebrow, h1, .subtitle").forEach(function (el) {
-      var r = el.getBoundingClientRect();
-      avoid.push({
-        left:   r.left   - cardRect.left,
-        top:    r.top    - cardRect.top,
-        right:  r.right  - cardRect.left,
-        bottom: r.bottom - cardRect.top
-      });
-    });
-    var yr = yesBtn.getBoundingClientRect();
-    avoid.push({
-      left:   yr.left   - cardRect.left,
-      top:    yr.top    - cardRect.top,
-      right:  yr.right  - cardRect.left,
-      bottom: yr.bottom - cardRect.top
-    });
+    // Draw the scratch-off cover
+    var g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, "#1c3d63");
+    g.addColorStop(1, "#0f2a4a");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    // sparkles
+    ctx.fillStyle = "rgba(253,246,236,0.18)";
+    for (var i = 0; i < 22; i++) {
+      ctx.beginPath();
+      ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 2 + 0.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.fillStyle = "#fdf6ec";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "700 30px Georgia, serif";
+    ctx.fillText("?", w / 2, h / 2 - 8);
+    ctx.font = "600 12px Poppins, sans-serif";
+    ctx.fillText("SCRATCH TO REVEAL 👆", w / 2, h / 2 + 20);
 
-    function isClear(x, y) {
-      var BUF = 8; // keep a little breathing room around text
-      for (var i = 0; i < avoid.length; i++) {
-        var b = avoid[i];
-        var noOverlap = (x + w < b.left - BUF) || (x > b.right + BUF) ||
-                        (y + h < b.top - BUF)  || (y > b.bottom + BUF);
-        if (!noOverlap) return false;
+    var drawing = false;
+    var done = false;
+
+    function pt(e) {
+      var r = canvas.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+    function scratch(x, y) {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    function cleared() {
+      var img = ctx.getImageData(0, 0, w, h).data;
+      var clear = 0, step = 16, count = 0;
+      for (var i = 3; i < img.length; i += 4 * step) {
+        count++;
+        if (img[i] === 0) clear++;
       }
-      return true;
+      return clear / count;
+    }
+    function finish() {
+      if (done) return;
+      done = true;
+      scard.classList.add("done");
+      revealed++;
+      var key = Math.min(revealed, 3);
+      if (messages[key]) msgEl.textContent = messages[key];
+      toPickup.classList.remove("hidden");
+      if (!lockedNotified) {
+        lockedNotified = true;
+        notify("Alessia's locking in Padella1895 🍝 (as if there was a choice 😄)");
+      }
     }
 
-    var x = pad, y = maxY, found = false;
-    for (var t = 0; t < 80 && !found; t++) {
-      x = pad + Math.random() * (maxX - pad);
-      y = pad + Math.random() * (maxY - pad);
-      if (isClear(x, y)) found = true;
+    canvas.addEventListener("pointerdown", function (e) {
+      if (done) return;
+      e.preventDefault();
+      drawing = true;
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+      var p = pt(e); scratch(p.x, p.y);
+    });
+    canvas.addEventListener("pointermove", function (e) {
+      if (!drawing || done) return;
+      e.preventDefault();
+      var p = pt(e); scratch(p.x, p.y);
+    });
+    function up() {
+      if (!drawing || done) { drawing = false; return; }
+      drawing = false;
+      if (cleared() > 0.5) finish();
     }
-    if (!found) { // fallback: the empty play band at the bottom
-      y = maxY;
-      x = pad + Math.random() * (maxX - pad);
-    }
-
-    noBtn.style.position = "absolute";
-    noBtn.style.margin = "0";
-    noBtn.style.left = x + "px";
-    noBtn.style.top  = y + "px";
-
-    var scale = Math.max(0.6, 1 - dodgeCount * 0.04);
-    noBtn.style.transform = "scale(" + scale + ")";
-
-    showTaunt(cardRect.left + x + w / 2, cardRect.top + y - 6);
-    dodgeCount++;
+    canvas.addEventListener("pointerup", up);
+    canvas.addEventListener("pointercancel", up);
+    canvas.addEventListener("pointerleave", up);
   }
 
-  function showTaunt(cx, cy) {
-    taunt.textContent = taunts[Math.floor(Math.random() * taunts.length)];
-    cy = Math.max(28, cy);
-    taunt.style.left = cx + "px";
-    taunt.style.top  = cy + "px";
-    taunt.classList.add("show");
-    clearTimeout(showTaunt._t);
-    showTaunt._t = setTimeout(function () {
-      taunt.classList.remove("show");
-    }, 900);
-  }
+  document.querySelectorAll(".scard").forEach(setupCard);
 
-  ["mouseenter", "mouseover", "pointerenter", "pointerover", "focus"].forEach(function (ev) {
-    noBtn.addEventListener(ev, function () { moveNo(); });
-  });
-  ["pointerdown", "mousedown"].forEach(function (ev) {
-    noBtn.addEventListener(ev, function (e) { e.preventDefault(); moveNo(); });
-  });
-  noBtn.addEventListener("touchstart", function (e) {
-    e.preventDefault();
-    moveNo();
-  }, { passive: false });
-  noBtn.addEventListener("click", function (e) { e.preventDefault(); moveNo(); });
+  /* ===== Navigation: scratch -> pickup ===== */
+  var scratchSec = document.getElementById("scratch");
+  var pickupSec = document.getElementById("pickup");
+  var doneSec = document.getElementById("done");
 
-  /* ---- Yes button: go to the day picker ---- */
-  yesBtn.addEventListener("click", function () {
-    notify("Alessia said YES! 🎉💛");
-    question.style.display = "none";
-    taunt.classList.remove("show");
-    noBtn.style.display = "none";
-    choose.classList.add("visible");
+  toPickup.addEventListener("click", function () {
+    scratchSec.style.display = "none";
+    pickupSec.classList.add("visible");
+    window.scrollTo(0, 0);
+  });
+
+  /* ===== Pickup: optional geolocation ===== */
+  var geoBtn = document.getElementById("geoBtn");
+  var geoStatus = document.getElementById("geoStatus");
+  var mapsLink = "";
+
+  geoBtn.addEventListener("click", function () {
+    if (!navigator.geolocation) {
+      geoStatus.textContent = "Not supported — just type it above 🙂";
+      return;
+    }
+    geoStatus.textContent = "Getting your location…";
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      var lat = pos.coords.latitude.toFixed(6);
+      var lng = pos.coords.longitude.toFixed(6);
+      mapsLink = "https://www.google.com/maps?q=" + lat + "," + lng;
+      geoStatus.textContent = "📍 Location captured!";
+      geoStatus.className = "geo-status ok";
+    }, function () {
+      geoStatus.textContent = "Couldn't get it — just type your address 🙂";
+      geoStatus.className = "geo-status";
+    }, { enableHighAccuracy: true, timeout: 10000 });
+  });
+
+  /* ===== Confirm pick-up ===== */
+  document.getElementById("confirmPickup").addEventListener("click", function () {
+    var addr = document.getElementById("addr").value.trim();
+    if (!addr && !mapsLink) {
+      geoStatus.textContent = "Please type where I should pick you up 💛";
+      geoStatus.className = "geo-status";
+      document.getElementById("addr").focus();
+      return;
+    }
+
+    // Build Denis's notification + the on-screen summary
+    var msg = "🚗 Pick up Alessia at:";
+    var display = "";
+    if (addr) { msg += " " + addr; display = addr; }
+    if (mapsLink) {
+      msg += (addr ? "\n" : " ") + "Map: " + mapsLink;
+      display += (display ? " " : "") + "(📍 live location shared)";
+    }
+    notify(msg);
+
+    document.getElementById("donePickup").textContent = display || "📍 Live location shared";
+    pickupSec.classList.remove("visible");
+    pickupSec.style.display = "none";
+    doneSec.classList.add("visible");
     window.scrollTo(0, 0);
     launchConfetti();
   });
 
-  /* ---- Day buttons: confirm the chosen evening ---- */
-  var dayBtns = document.querySelectorAll(".day-btn");
-  dayBtns.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var dow = btn.getAttribute("data-dow");
-      var date = btn.getAttribute("data-date");
-      notify("Alessia chose " + dow + ", " + date + " (8:00 PM)! 🗓️💛");
-
-      document.getElementById("confDate").textContent = dow + " — " + date;
-      document.getElementById("confHeading").textContent = "See you " + dow + "!";
-
-      choose.classList.remove("visible");
-      choose.style.display = "none";
-      confirmed.classList.add("visible");
-      window.scrollTo(0, 0);
-      launchConfetti();
-    });
-  });
-
-  /* ---- Lightweight self-contained confetti + hearts ---- */
+  /* ===== Lightweight confetti + hearts ===== */
   var canvas = document.getElementById("confetti");
   var ctx = canvas.getContext("2d");
-  var pieces = [];
-  var running = false;
+  var pieces = [], running = false;
   var colors = ["#0f2a4a", "#e63946", "#ffd166", "#4895ef", "#9b5de5", "#fdf6ec"];
   var hearts = ["❤", "💛", "💙", "💜", "✨"];
 
   function sizeCanvas() {
     var dpr = window.devicePixelRatio || 1;
-    canvas.width  = window.innerWidth  * dpr;
+    canvas.width = window.innerWidth * dpr;
     canvas.height = window.innerHeight * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
@@ -535,43 +434,24 @@
       });
     }
   }
-
   function tick() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (var i = pieces.length - 1; i >= 0; i--) {
       var p = pieces[i];
-      p.vy += p.g;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.rot += p.vrot;
-      p.life++;
-
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
+      p.vy += p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vrot; p.life++;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
       if (p.heart) {
-        ctx.font = p.size + "px serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
+        ctx.font = p.size + "px serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText(p.heart, 0, 0);
       } else {
-        ctx.fillStyle = p.color;
-        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+        ctx.fillStyle = p.color; ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
       }
       ctx.restore();
-
-      if (p.y > window.innerHeight + 60 || p.life > 320) {
-        pieces.splice(i, 1);
-      }
+      if (p.y > window.innerHeight + 60 || p.life > 320) pieces.splice(i, 1);
     }
-    if (pieces.length > 0) {
-      requestAnimationFrame(tick);
-    } else {
-      running = false;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+    if (pieces.length > 0) requestAnimationFrame(tick);
+    else { running = false; ctx.clearRect(0, 0, canvas.width, canvas.height); }
   }
-
   function launchConfetti() {
     spawnBurst(90);
     setTimeout(function () { spawnBurst(60); }, 250);
