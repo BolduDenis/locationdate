@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0f2a4a" />
+<title>A question for Alessia 💌</title>
+
+<!-- Optional pretty fonts; the page still looks good if these fail to load -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --navy: #0f2a4a;
+    --navy-soft: #1c3d63;
+    --cream: #fdf6ec;
+    --cream-deep: #f5ead6;
+    --red: #e63946;
+    --yellow: #ffd166;
+    --blue: #4895ef;
+    --purple: #9b5de5;
+    --shadow: 0 18px 50px rgba(15, 42, 74, 0.18);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body { height: 100%; margin: 0; }
+
+  body {
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--navy);
+    min-height: 100%;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+    position: relative;
+    background:
+      radial-gradient(closest-side at 18% 12%, rgba(230, 57, 70, 0.10), transparent 60%),
+      radial-gradient(closest-side at 85% 18%, rgba(255, 209, 102, 0.14), transparent 60%),
+      radial-gradient(closest-side at 12% 85%, rgba(72, 149, 239, 0.12), transparent 60%),
+      radial-gradient(closest-side at 88% 88%, rgba(155, 93, 229, 0.12), transparent 60%),
+      linear-gradient(160deg, var(--cream) 0%, var(--cream-deep) 100%);
+  }
+
+  /* Confetti canvas sits above everything but ignores taps */
+  #confetti {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 540px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(15, 42, 74, 0.08);
+    border-radius: 26px;
+    box-shadow: var(--shadow);
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    animation: rise 0.6s ease both;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .eyebrow {
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--navy-soft);
+    opacity: 0.7;
+    margin: 0 0 14px;
+  }
+
+  h1 {
+    font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    line-height: 1.18;
+    font-size: clamp(1.55rem, 6.2vw, 2.35rem);
+    margin: 0 0 8px;
+    color: var(--navy);
+  }
+
+  .subtitle {
+    font-size: clamp(0.95rem, 3.6vw, 1.08rem);
+    color: var(--navy-soft);
+    margin: 0 auto 30px;
+    max-width: 380px;
+    line-height: 1.5;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    min-height: 60px;
+  }
+
+  /* Empty room beneath the buttons so the runaway "No" always has free space */
+  .playzone { height: 120px; }
+
+  button {
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 999px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 14px 34px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    touch-action: manipulation;
+  }
+
+  #yesBtn {
+    background: var(--navy);
+    color: var(--cream);
+    box-shadow: 0 10px 24px rgba(15, 42, 74, 0.28);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  #yesBtn:hover { transform: translateY(-2px) scale(1.03); }
+  #yesBtn:active { transform: scale(0.97); }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 10px 24px rgba(15, 42, 74, 0.28); }
+    50%      { box-shadow: 0 10px 34px rgba(230, 57, 70, 0.45); }
+  }
+
+  #noBtn {
+    background: transparent;
+    color: var(--navy-soft);
+    border-color: rgba(15, 42, 74, 0.35);
+    z-index: 60;
+  }
+
+  /* Taunt bubble that follows the runaway No button */
+  #taunt {
+    position: fixed;
+    z-index: 61;
+    background: var(--red);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(230, 57, 70, 0.4);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+  }
+  #taunt.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+  /* ===== Day picker ===== */
+  #choose { display: none; }
+  #choose.visible { display: block; animation: rise 0.5s ease both; }
+
+  .day-options {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .day-btn {
+    flex: 1 1 180px;
+    max-width: 220px;
+    background: #fff;
+    border: 2px solid rgba(15, 42, 74, 0.22);
+    border-radius: 18px;
+    padding: 20px 16px;
+    cursor: pointer;
+    text-align: center;
+    color: var(--navy);
+  }
+  .day-btn:hover {
+    transform: translateY(-3px);
+    border-color: var(--navy);
+    box-shadow: 0 12px 26px rgba(15, 42, 74, 0.18);
+  }
+  .day-btn:active { transform: scale(0.98); }
+  .day-btn .dow {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    display: block;
+  }
+  .day-btn .date { font-size: 1rem; font-weight: 600; margin-top: 4px; color: var(--navy-soft); }
+  .day-btn .time { font-size: 0.85rem; margin-top: 8px; color: var(--navy-soft); opacity: 0.85; }
+  .day-btn .time::before { content: "🕗 "; }
+
+  /* ===== Confirmation screen ===== */
+  #confirmed { display: none; }
+  #confirmed.visible { display: block; animation: rise 0.6s ease both; }
+
+  .big-emoji {
+    font-size: 3rem;
+    margin-bottom: 6px;
+    animation: pop 0.6s ease both;
+  }
+  @keyframes pop {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+
+  .details {
+    margin: 26px auto 6px;
+    text-align: left;
+    max-width: 360px;
+    background: rgba(15, 42, 74, 0.04);
+    border: 1px solid rgba(15, 42, 74, 0.08);
+    border-radius: 18px;
+    padding: 18px 20px;
+  }
+  .detail-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px dashed rgba(15, 42, 74, 0.14);
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--navy-soft);
+    opacity: 0.75;
+    min-width: 74px;
+    font-weight: 600;
+  }
+  .detail-value { font-size: 1.05rem; font-weight: 600; color: var(--navy); }
+
+  .contact {
+    margin-top: 24px;
+    font-size: 0.95rem;
+    color: var(--navy-soft);
+    line-height: 1.7;
+  }
+  .contact p { margin: 0 0 8px; }
+  .contact a {
+    color: var(--navy);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 2px solid var(--yellow);
+  }
+  .contact a:hover { border-bottom-color: var(--red); }
+
+  .footer-heart {
+    margin-top: 22px;
+    font-size: 1.4rem;
+    color: var(--red);
+    animation: beat 1.3s ease-in-out infinite;
+  }
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.18); }
+  }
+</style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <main class="card">
+    <!-- ===== Question screen ===== -->
+    <section id="question">
+      <p class="eyebrow">A little question</p>
+      <h1>Hi Alessia,<br />Do you want to go on a date with me?</h1>
+      <p class="subtitle">No pressure&hellip; well, maybe a little. 😊</p>
+      <div class="buttons">
+        <button id="yesBtn" type="button">Yes 💛</button>
+        <button id="noBtn" type="button">No</button>
+      </div>
+      <div class="playzone" aria-hidden="true"></div>
+    </section>
+
+    <!-- ===== Day picker screen ===== -->
+    <section id="choose">
+      <div class="big-emoji">💛</div>
+      <p class="eyebrow">Great answer</p>
+      <h1>Now pick our evening</h1>
+      <p class="subtitle">Which day works best for you? Tap the one you prefer. 🥂</p>
+      <div class="day-options">
+        <button class="day-btn" type="button" data-key="wed" data-dow="Wednesday" data-date="08.07.2026">
+          <span class="dow">Wednesday</span>
+          <span class="date">08.07.2026</span>
+          <span class="time">8:00 PM</span>
+        </button>
+        <button class="day-btn" type="button" data-key="thu" data-dow="Thursday" data-date="09.07.2026">
+          <span class="dow">Thursday</span>
+          <span class="date">09.07.2026</span>
+          <span class="time">8:00 PM</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== Confirmation screen ===== -->
+    <section id="confirmed">
+      <div class="big-emoji">🎉</div>
+      <p class="eyebrow">It's a date</p>
+      <h1 id="confHeading">See you then!</h1>
+      <p class="subtitle">Can&rsquo;t wait to see you &mdash; I&rsquo;ll share the exact spot soon. 🥂</p>
+
+      <div class="details">
+        <div class="detail-row">
+          <span class="detail-label">Date</span>
+          <span class="detail-value" id="confDate">&mdash;</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Time</span>
+          <span class="detail-value">8:00 PM &mdash; pick-up</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Location</span>
+          <span class="detail-value">To be announced</span>
+        </div>
+      </div>
+
+      <div class="contact">
+        <p>For more information or any questions, please contact me:</p>
+        <p>✉️ <a href="mailto:denisboldu2014@gmail.com">denisboldu2014@gmail.com</a></p>
+        <p>📞 <a href="tel:0770803690">0770 803 690</a></p>
+      </div>
+
+      <div class="footer-heart">❤</div>
+    </section>
+  </main>
+
+  <div id="taunt"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ===== Phone notifications via ntfy.sh (no account needed) =====
+     Subscribe to this exact topic in the free "ntfy" app to get the alerts.
+     Keep the topic name PRIVATE — anyone who knows it can read the pings. */
+  var NTFY_TOPIC = "alessia-b38hy7m28h2v";
+  function notify(message) {
+    try {
+      fetch("https://ntfy.sh/" + NTFY_TOPIC, {
+        method: "POST",
+        body: message,
+        keepalive: true
+      }).catch(function () {}); // never let a failed ping break the page
+    } catch (e) {}
+  }
+  // Fire as soon as the page is opened
+  notify("Alessia just opened the date site! 💌");
+
+  var noBtn    = document.getElementById("noBtn");
+  var yesBtn   = document.getElementById("yesBtn");
+  var taunt    = document.getElementById("taunt");
+  var question = document.getElementById("question");
+  var choose   = document.getElementById("choose");
+  var confirmed = document.getElementById("confirmed");
+  var card     = document.querySelector(".card");
+
+  var taunts = [
+    "Nope! 😜", "Try again!", "Catch me if you can! 🏃", "Too slow! 🐌",
+    "Not today! 😎", "Wrong button 😅", "Hehe, nope!", "Nice try! 😏",
+    "Missed me! 👻", "Think again 🤔", "Just say yes already 💛",
+    "This button is shy 🙈", "Error 404: No not found", "Slippery, aren't I? 🧈",
+    "Yes is right there → 👉"
+  ];
+  var dodgeCount = 0;
+
+  /* ---- Make the No button run away ---- */
+  function moveNo() {
+    var w = noBtn.offsetWidth || 80;
+    var h = noBtn.offsetHeight || 48;
+    var pad = 12;
+    var cardRect = card.getBoundingClientRect();
+    var maxX = Math.max(pad, card.clientWidth  - w - pad);
+    var maxY = Math.max(pad, card.clientHeight - h - pad);
+
+    // Areas the button must NOT cover: the question text + the Yes button
+    var avoid = [];
+    question.querySelectorAll(".eyebrow, h1, .subtitle").forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      avoid.push({
+        left:   r.left   - cardRect.left,
+        top:    r.top    - cardRect.top,
+        right:  r.right  - cardRect.left,
+        bottom: r.bottom - cardRect.top
+      });
+    });
+    var yr = yesBtn.getBoundingClientRect();
+    avoid.push({
+      left:   yr.left   - cardRect.left,
+      top:    yr.top    - cardRect.top,
+      right:  yr.right  - cardRect.left,
+      bottom: yr.bottom - cardRect.top
+    });
+
+    function isClear(x, y) {
+      var BUF = 8; // keep a little breathing room around text
+      for (var i = 0; i < avoid.length; i++) {
+        var b = avoid[i];
+        var noOverlap = (x + w < b.left - BUF) || (x > b.right + BUF) ||
+                        (y + h < b.top - BUF)  || (y > b.bottom + BUF);
+        if (!noOverlap) return false;
+      }
+      return true;
+    }
+
+    var x = pad, y = maxY, found = false;
+    for (var t = 0; t < 80 && !found; t++) {
+      x = pad + Math.random() * (maxX - pad);
+      y = pad + Math.random() * (maxY - pad);
+      if (isClear(x, y)) found = true;
+    }
+    if (!found) { // fallback: the empty play band at the bottom
+      y = maxY;
+      x = pad + Math.random() * (maxX - pad);
+    }
+
+    noBtn.style.position = "absolute";
+    noBtn.style.margin = "0";
+    noBtn.style.left = x + "px";
+    noBtn.style.top  = y + "px";
+
+    var scale = Math.max(0.6, 1 - dodgeCount * 0.04);
+    noBtn.style.transform = "scale(" + scale + ")";
+
+    showTaunt(cardRect.left + x + w / 2, cardRect.top + y - 6);
+    dodgeCount++;
+  }
+
+  function showTaunt(cx, cy) {
+    taunt.textContent = taunts[Math.floor(Math.random() * taunts.length)];
+    cy = Math.max(28, cy);
+    taunt.style.left = cx + "px";
+    taunt.style.top  = cy + "px";
+    taunt.classList.add("show");
+    clearTimeout(showTaunt._t);
+    showTaunt._t = setTimeout(function () {
+      taunt.classList.remove("show");
+    }, 900);
+  }
+
+  ["mouseenter", "mouseover", "pointerenter", "pointerover", "focus"].forEach(function (ev) {
+    noBtn.addEventListener(ev, function () { moveNo(); });
+  });
+  ["pointerdown", "mousedown"].forEach(function (ev) {
+    noBtn.addEventListener(ev, function (e) { e.preventDefault(); moveNo(); });
+  });
+  noBtn.addEventListener("touchstart", function (e) {
+    e.preventDefault();
+    moveNo();
+  }, { passive: false });
+  noBtn.addEventListener("click", function (e) { e.preventDefault(); moveNo(); });
+
+  /* ---- Yes button: go to the day picker ---- */
+  yesBtn.addEventListener("click", function () {
+    notify("Alessia said YES! 🎉💛");
+    question.style.display = "none";
+    taunt.classList.remove("show");
+    noBtn.style.display = "none";
+    choose.classList.add("visible");
+    window.scrollTo(0, 0);
+    launchConfetti();
+  });
+
+  /* ---- Day buttons: confirm the chosen evening ---- */
+  var dayBtns = document.querySelectorAll(".day-btn");
+  dayBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var dow = btn.getAttribute("data-dow");
+      var date = btn.getAttribute("data-date");
+      notify("Alessia chose " + dow + ", " + date + " (8:00 PM)! 🗓️💛");
+
+      document.getElementById("confDate").textContent = dow + " — " + date;
+      document.getElementById("confHeading").textContent = "See you " + dow + "!";
+
+      choose.classList.remove("visible");
+      choose.style.display = "none";
+      confirmed.classList.add("visible");
+      window.scrollTo(0, 0);
+      launchConfetti();
+    });
+  });
+
+  /* ---- Lightweight self-contained confetti + hearts ---- */
+  var canvas = document.getElementById("confetti");
+  var ctx = canvas.getContext("2d");
+  var pieces = [];
+  var running = false;
+  var colors = ["#0f2a4a", "#e63946", "#ffd166", "#4895ef", "#9b5de5", "#fdf6ec"];
+  var hearts = ["❤", "💛", "💙", "💜", "✨"];
+
+  function sizeCanvas() {
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width  = window.innerWidth  * dpr;
+    canvas.height = window.innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener("resize", sizeCanvas);
+  sizeCanvas();
+
+  function spawnBurst(n) {
+    for (var i = 0; i < n; i++) {
+      var isHeart = Math.random() < 0.28;
+      pieces.push({
+        x: window.innerWidth / 2 + (Math.random() - 0.5) * 120,
+        y: window.innerHeight / 2 - 40,
+        vx: (Math.random() - 0.5) * 12,
+        vy: -8 - Math.random() * 9,
+        g: 0.28 + Math.random() * 0.12,
+        size: isHeart ? 16 + Math.random() * 14 : 6 + Math.random() * 7,
+        rot: Math.random() * Math.PI * 2,
+        vrot: (Math.random() - 0.5) * 0.3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        heart: isHeart ? hearts[Math.floor(Math.random() * hearts.length)] : null,
+        life: 0
+      });
+    }
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var i = pieces.length - 1; i >= 0; i--) {
+      var p = pieces[i];
+      p.vy += p.g;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vrot;
+      p.life++;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      if (p.heart) {
+        ctx.font = p.size + "px serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(p.heart, 0, 0);
+      } else {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+      }
+      ctx.restore();
+
+      if (p.y > window.innerHeight + 60 || p.life > 320) {
+        pieces.splice(i, 1);
+      }
+    }
+    if (pieces.length > 0) {
+      requestAnimationFrame(tick);
+    } else {
+      running = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  function launchConfetti() {
+    spawnBurst(90);
+    setTimeout(function () { spawnBurst(60); }, 250);
+    setTimeout(function () { spawnBurst(50); }, 600);
+    if (!running) { running = true; requestAnimationFrame(tick); }
+  }
+})();
+</script>
+</body>
+</html>
